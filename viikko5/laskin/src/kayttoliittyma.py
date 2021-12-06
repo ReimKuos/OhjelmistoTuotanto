@@ -8,11 +8,59 @@ class Komento(Enum):
     NOLLAUS = 3
     KUMOA = 4
 
+class Summa:
+    def __init__(self, sovellus, syote):
+        self._sovellus = sovellus
+        self._syote = syote
+    def suorita(self):
+        arvo = 0
+        try:
+            arvo = int(self._syote())
+        except Exception:
+            pass
+        self._sovellus.plus(arvo)
+
+class Erotus:
+    def __init__(self, sovellus, syote):
+        self._sovellus = sovellus
+        self._syote = syote
+    def suorita(self):
+        arvo = 0
+        try:
+            arvo = int(self._syote())
+        except Exception:
+            pass
+        self._sovellus.miinus(arvo)
+
+
+class Kumoa:
+    def __init__(self, sovellus, syote):
+        self._sovellus = sovellus
+        self._syote = syote
+    def suorita(self):
+        pass
+
+class Nollaus:
+    def __init__(self, sovellus, syote):
+        self._sovellus = sovellus
+        self._syote = syote
+    def suorita(self):
+        self._sovellus.nollaa()
 
 class Kayttoliittyma:
     def __init__(self, sovellus, root):
         self._sovellus = sovellus
         self._root = root
+
+        self._komennot = {
+            Komento.SUMMA: Summa(sovellus, self._lue_syote),
+            Komento.EROTUS: Erotus(sovellus, self._lue_syote),
+            Komento.NOLLAUS: Nollaus(sovellus, self._lue_syote),
+            Komento.KUMOA: Kumoa(sovellus, self._lue_syote)
+        }
+
+    def _lue_syote(self):
+        return self._syote_kentta.get()
 
     def kaynnista(self):
         self._tulos_var = StringVar()
@@ -55,22 +103,8 @@ class Kayttoliittyma:
         self._kumoa_painike.grid(row=2, column=3)
 
     def _suorita_komento(self, komento):
-        arvo = 0
-
-        try:
-            arvo = int(self._syote_kentta.get())
-        except Exception:
-            pass
-
-        if komento == Komento.SUMMA:
-            self._sovellus.plus(arvo)
-        elif komento == Komento.EROTUS:
-            self._sovellus.miinus(arvo)
-        elif komento == Komento.NOLLAUS:
-            self._sovellus.nollaa()
-        elif komento == Komento.KUMOA:
-            pass
-
+        komento_olio = self._komennot[komento]
+        komento_olio.suorita()
         self._kumoa_painike["state"] = constants.NORMAL
 
         if self._sovellus.tulos == 0:
