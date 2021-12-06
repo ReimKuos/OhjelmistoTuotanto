@@ -100,7 +100,7 @@ class IntJoukko:
         a_taulu = a.to_int_list()
         b_taulu = b.to_int_list()
 
-        for i in range(0, len(a_taulu)):
+        for i in range(0, len(a_taulu)):hja
             x.lisaa(a_taulu[i])
 
         for i in range(0, len(b_taulu)):
