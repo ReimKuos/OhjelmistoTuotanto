@@ -12,40 +12,58 @@ class Summa:
     def __init__(self, sovellus, syote):
         self._sovellus = sovellus
         self._syote = syote
+        self.edellinen = 0
     def suorita(self):
         arvo = 0
         try:
             arvo = int(self._syote())
         except Exception:
             pass
+        self.edellinen = arvo
         self._sovellus.plus(arvo)
+    def kumoa(self):
+        self._sovellus.plus(-self.edellinen)
+        self.edellinen = 0
 
 class Erotus:
     def __init__(self, sovellus, syote):
         self._sovellus = sovellus
         self._syote = syote
+        self.edellinen = 0
     def suorita(self):
         arvo = 0
         try:
             arvo = int(self._syote())
         except Exception:
             pass
+        self.edellinen = arvo
         self._sovellus.miinus(arvo)
-
+    def kumoa(self):
+        self._sovellus.miinus(-self.edellinen)
+        self.edellinen = 0
 
 class Kumoa:
     def __init__(self, sovellus, syote):
         self._sovellus = sovellus
         self._syote = syote
+        self.edellinen = None
+    def lisaa_edellinen(self, edellinen):
+        self.edellinen = edellinen
     def suorita(self):
-        pass
+        if self.edellinen is not None and self.edellinen != self:
+            self.edellinen.kumoa()
+            self.edellinen = None
 
 class Nollaus:
     def __init__(self, sovellus, syote):
         self._sovellus = sovellus
         self._syote = syote
+        self.edellinen = 0
     def suorita(self):
+        self.edellinen = self._sovellus.tulos
         self._sovellus.nollaa()
+    def kumoa(self):
+        self._sovellus.plus(self.edellinen)
 
 class Kayttoliittyma:
     def __init__(self, sovellus, root):
@@ -58,6 +76,8 @@ class Kayttoliittyma:
             Komento.NOLLAUS: Nollaus(sovellus, self._lue_syote),
             Komento.KUMOA: Kumoa(sovellus, self._lue_syote)
         }
+
+        self.kumous = self._komennot[Komento.KUMOA]
 
     def _lue_syote(self):
         return self._syote_kentta.get()
@@ -114,3 +134,4 @@ class Kayttoliittyma:
 
         self._syote_kentta.delete(0, constants.END)
         self._tulos_var.set(self._sovellus.tulos)
+        self.kumous.lisaa_edellinen(komento_olio)
